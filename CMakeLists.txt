@@ -8,14 +8,20 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(PCL REQUIRED QUIET)
 
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS 
+roscpp
+rosbag
+pcl_conversions)
 catkin_package()
 
 include_directories(
     ${catkin_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check http://doc.qt.io/qt-5/deployment-android.html for more information.
@@ -30,22 +36,19 @@ include_directories(
 #    endif()
 #endif()
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-if(ANDROID)
-  add_library(tools SHARED
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+add_executable(tools
+  main.cpp
+  mainwindow.cpp
+  mainwindow.h
+  mainwindow.ui
+  parase_rosbag.h
+  parse_rosbag.cc
   )
-else()
-  add_executable(tools
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-  )
-endif()
 
-target_link_libraries(tools PRIVATE Qt5::Widgets)
+
+target_link_libraries(tools  
+  Qt5::Widgets
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARY_DIRS}
+)
