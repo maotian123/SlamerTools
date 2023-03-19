@@ -13,13 +13,24 @@
 #include <ros/ros.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
-#include <std_msgs/Int8.h>
+
 #include <iostream>
 #include <string>
 
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/NavSatFix.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "sensor_msgs/CompressedImage.h"
+#include "geometry_msgs/TwistStamped.h"
+#include "geometry_msgs/PoseStamped.h"
+
+#include <std_msgs/Int8.h>
+
+#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
+
+#include <cv_bridge/cv_bridge.h>
+#include "opencv2/imgcodecs.hpp"
 
 struct VelodynePointXYZIRT {
   PCL_ADD_POINT4D
@@ -46,6 +57,38 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(
     (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(
         uint16_t, ring, ring)(double, timestamp, timestamp))
 
+
+struct Pose4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+struct Pose3
+{
+    float x;
+    float y;
+    float z;
+};
+
+struct ImuMsg
+{
+    Pose4 orientation;
+    Pose3 angular_velocity;
+    Pose3 linear_acceleration;
+};
+
+struct GpsMsg
+{
+    float latitude;
+    float longitude;
+    float altitude;
+    int status;
+    int sevice;
+};
+
 using PointXYZIRT = VelodynePointXYZIRT;
 
 
@@ -54,7 +97,6 @@ class parase_rosbag
 {
 private:
     std::vector<std::string> _bag_file;
-
     // ROS topic name
     // sensor_msgs/NavSatFix
     const std::string kDefaultFixTopic = "/gps/fix";
@@ -65,6 +107,7 @@ private:
     const std::string kDefaultTwistTopic = "/gps/twist";
     // sensor_msgs/PointCloud2
     const std::string kDefaultPointCloudTopic = "/rslidar_points";
+    const std::string kDefaultPoseTopic = "/ndt_pose";
     // const std::string kDefaultPointCloudTopic = "/points_raw";
     // const std::string kDefaultCameraTopic =
     //     "/galaxy_camera_right/image_raw/compressed";
@@ -73,9 +116,26 @@ private:
     const std::string kDefaultCameraTopic =
         "/galaxy_camera/image_raw/compressed";
         /* data */
+    const std::string kPointCloudTimestampFileName = "point_clouds.ts";
+    const std::string kImageTimestampFileName = "img.ts";
 
-    int _index{0};
-    std::vector<uint64_t> _timestamps;
+    const std::string kImuDataFileName   = "imu.ts";
+    const std::string kGpsDataFileName   = "gps.ts";
+    const std::string kTwistDataFileName = "twist.ts";
+    const std::string kPoseDataFileName  = "pose.ts";
+
+    int _lidar_index{0};
+    int _camera_index{0};
+    int _imu_index{0};
+    int _gps_index{0};
+    int _twist_index{0};
+    int _ndt_pose_index{0};
+
+    std::vector<uint64_t> _lidar_timestamps;
+    std::vector<uint64_t> _camera_timestamps;
+    std::vector<uint64_t> _imu_timestamps;
+    std::vector<uint64_t> _pose_timestamps;
+    std::vector<uint64_t> _gps_timestamps;
     std::vector<uint64_t> _seqs;
 
     uint64_t getTimeStamps(int32_t sec, int32_t nsec) {
@@ -85,11 +145,19 @@ private:
     }
 public:
     parase_rosbag(/* args */);
+    void process();
     ~parase_rosbag();
 private:
     void initFilePath();
-    void process();
-    void processPointCloud(const std::string& bag_file);
+    void processPointCloud(const std::string &bag_file);
+    void processImage(const std::string &bag_file);
+    void processImu(const std::string &bag_file);
+    void processGps(const std::string &bag_file);
+    void processTwist(const std::string &bag_file);
+    void processPose(const std::string &bag_file);
+
+    void writeLidarTimestamps();
+    void writeCameraTimestamps();
 };
 
 
