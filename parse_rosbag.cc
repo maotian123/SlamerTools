@@ -13,11 +13,11 @@ parase_rosbag::~parase_rosbag()
 void parase_rosbag::initFilePath()
 {
   _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-53-12_0.bag");
-  // _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-54-15_1.bag");
-  // _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-55-15_2.bag");
-  // _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-56-15_3.bag");
-  // _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-57-15_4.bag");
-  // _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-58-15_5.bag");
+  _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-54-15_1.bag");
+  _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-55-15_2.bag");
+  _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-56-15_3.bag");
+  _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-57-15_4.bag");
+  _bag_file.push_back("/media/tyh/06889091889080BB/1/2023-03-08-14-58-15_5.bag");
 }
 
 void parase_rosbag::process()
@@ -26,9 +26,9 @@ void parase_rosbag::process()
   for (const auto& file : _bag_file) 
   {
     std::cout << "Parsing point cloud from: " << file << std::endl;
-    // processPointCloud(file);
-    // processImage(file);
-    // processImu(file);
+    processPointCloud(file);
+    processImage(file);
+    processImu(file);
     processGps(file);
     processTwist(file);
     processPose(file);
@@ -200,18 +200,18 @@ void parase_rosbag::processImu(const std::string &bag_file)
         
         if(file.is_open())
         {
-          file << _imu_index << "，" 
-               << timestamp  << "，"
-               << imu_msgs->angular_velocity.x  << "，" 
-               << imu_msgs->angular_velocity.y  << "，" 
-               << imu_msgs->angular_velocity.z  << "，" 
-               << imu_msgs->linear_acceleration.x  << "，" 
-               << imu_msgs->linear_acceleration.y  << "，" 
-               << imu_msgs->linear_acceleration.z  << "，" 
-               << imu_msgs->orientation.x  << "，" 
-               << imu_msgs->orientation.y  << "，" 
-               << imu_msgs->orientation.z  << "，" 
-               << imu_msgs->orientation.w  << "，" << std::endl;
+          file << _imu_index << "," 
+               << timestamp  << ","
+               << imu_msgs->angular_velocity.x  << "," 
+               << imu_msgs->angular_velocity.y  << "," 
+               << imu_msgs->angular_velocity.z  << "," 
+               << imu_msgs->linear_acceleration.x  << "," 
+               << imu_msgs->linear_acceleration.y  << "," 
+               << imu_msgs->linear_acceleration.z  << "," 
+               << imu_msgs->orientation.x  << "," 
+               << imu_msgs->orientation.y  << "," 
+               << imu_msgs->orientation.z  << "," 
+               << imu_msgs->orientation.w  << "," << std::endl;
         }
       }
     }
@@ -251,11 +251,11 @@ void parase_rosbag::processGps(const std::string &bag_file)
         
         if(file.is_open())
         {
-          file << _gps_index << "，" << timestamp  << "，"
-               << gps_msgs->altitude << "，" 
-               << gps_msgs->latitude  << "，" 
-               << gps_msgs->longitude  << "，" 
-               << (int)gps_msgs->status.status  << "，"  << std::endl;
+          file << _gps_index << "," << timestamp  << ","
+               << gps_msgs->altitude << "," 
+               << gps_msgs->latitude  << "," 
+               << gps_msgs->longitude  << "," 
+               << (int)gps_msgs->status.status  << ","  << std::endl;
         }
       }
     }
@@ -294,13 +294,13 @@ void parase_rosbag::processTwist(const std::string &bag_file)
           
         if(file.is_open())
         {
-          file << _twist_index << "，" << timestamp  << "，"
-               << twist_msgs->twist.angular.x << "，" 
-               << twist_msgs->twist.angular.y << "，" 
-               << twist_msgs->twist.angular.z << "，" 
-               << twist_msgs->twist.linear.x  << "，"  
-               << twist_msgs->twist.linear.y  << "，"  
-               << twist_msgs->twist.linear.z  << "，"  
+          file << _twist_index << "," << timestamp  << ","
+               << twist_msgs->twist.angular.x << "," 
+               << twist_msgs->twist.angular.y << "," 
+               << twist_msgs->twist.angular.z << "," 
+               << twist_msgs->twist.linear.x  << ","  
+               << twist_msgs->twist.linear.y  << ","  
+               << twist_msgs->twist.linear.z  << ","  
                << std::endl;
         }
       }
@@ -340,15 +340,15 @@ void parase_rosbag::processPose(const std::string &bag_file)
           
         if(file.is_open())
         {
-          file << _ndt_pose_index << "，" 
-               << timestamp  << "，"
-               << pose_msgs->pose.position.x << "，" 
-               << pose_msgs->pose.position.y << "，" 
-               << pose_msgs->pose.position.z << "，" 
-               << pose_msgs->pose.orientation.x  << "，"  
-               << pose_msgs->pose.orientation.y  << "，"  
-               << pose_msgs->pose.orientation.z  << "，"  
-               << pose_msgs->pose.orientation.w  << "，"  
+          file << _ndt_pose_index << "," 
+               << timestamp  << ","
+               << pose_msgs->pose.position.x << "," 
+               << pose_msgs->pose.position.y << "," 
+               << pose_msgs->pose.position.z << "," 
+               << pose_msgs->pose.orientation.x  << ","  
+               << pose_msgs->pose.orientation.y  << ","  
+               << pose_msgs->pose.orientation.z  << ","  
+               << pose_msgs->pose.orientation.w  << ","  
                << std::endl;
         }
       }
@@ -375,13 +375,15 @@ void parase_rosbag::writeLidarTimestamps()
 
 void parase_rosbag::writeCameraTimestamps()
 {
+  
   std::string ts_file_path = "/media/tyh/06889091889080BB/bag_data/img/timestamp/" + kImageTimestampFileName;
   std::ofstream file(ts_file_path, std::ios::trunc);
   if(file.is_open())
   {
     for(size_t i = 0; i < _camera_timestamps.size(); ++i)
     {
-      file << _camera_timestamps[i] << std::endl;
+      static uint64_t lidar_camera_diff =  _lidar_timestamps[0] - _camera_timestamps[0];
+      file << _camera_timestamps[i] + lidar_camera_diff << std::endl;
     }
     file.close(); 
   }
